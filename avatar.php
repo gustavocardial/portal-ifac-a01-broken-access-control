@@ -49,7 +49,10 @@ if (!SECURE && is_string($conteudo) && str_contains($conteudo, flags_catalogo()[
     <h3>Resposta recebida pelo servidor</h3>
     <pre class="mono" style="white-space:pre-wrap"><?= e(substr($conteudo, 0, 2000)) ?></pre>
   <?php endif; ?>
-  <p class="muted">Dica: o que será que o servidor consegue acessar que você,
-     pela rede, não consegue?</p>
+  <p class="muted">Dica: o servidor também alcança serviços que só respondem
+     <strong>localmente</strong> (em <code>127.0.0.1</code>), fora do alcance da
+     sua máquina na rede — por exemplo um painel interno de diagnóstico em
+     <code>/internal.php</code>. Será que dá para fazer o servidor buscá-lo
+     por você?</p>
 </div>
 <?php page_footer();

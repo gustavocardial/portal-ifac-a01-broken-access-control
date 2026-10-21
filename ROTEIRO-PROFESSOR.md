@@ -115,7 +115,11 @@ atribuídos a partir de dados do cliente — use uma allowlist de campos editáv
    mesmo **cross-site**, e o cookie `SameSite` passa a importar.
 3. Ajuste o campo "URL do portal" para `http://<IP>/seguranca` e clique em
    **RESGATAR PRÊMIO**. A página envia, escondido, um POST para `perfil.php`
-   trocando seu e-mail para `csrf@evil.com` — sem você pedir.
+   trocando seu e-mail — sem você pedir.
+
+A flag é revelada por **qualquer** troca de e-mail disparada de outra origem
+(o app detecta pela origem cross-site), então um PoC próprio do aluno, com
+qualquer e-mail, também é premiado — não precisa ser `@evil.com`.
 
 **Impacto:** um site malicioso realiza ações em nome da vítima autenticada
 (trocar e-mail/senha, transferir, apagar) aproveitando o cookie de sessão que o
@@ -163,13 +167,15 @@ concatene entrada do usuário em caminhos; guarde segredos fora do web root.
 **Onde:** o parâmetro `next` do login:
 `http://<IP>/seguranca/login.php?next=/dashboard.php`.
 
-**Explorar:** troque o destino por um endereço **absoluto/externo**:
+**Explorar:** troque o destino por **qualquer** endereço absoluto/externo:
 ```
-http://<IP>/seguranca/login.php?next=http://<IP>/seguranca/externo.php
+http://<IP>/seguranca/login.php?next=http://site-do-atacante.com/phish
 ```
-Após autenticar, o portal te joga para o endereço arbitrário. A página
-`externo.php` representa o "site do atacante" (num ataque real, uma cópia da tela
-de login para roubar credenciais). O mesmo vale para `go.php?next=...`.
+Após autenticar, o portal te joga para fora. Qualquer destino externo é
+encaminhado para a página `externo.php`, que faz o papel do "site do atacante"
+(num ataque real, uma cópia da tela de login para roubar credenciais) e revela a
+flag — o aluno não precisa adivinhar o nome de nenhum arquivo. O mesmo vale para
+`go.php?next=...`. Destinos **internos** (ex.: `/dashboard.php`) não revelam flag.
 
 **Impacto:** links que começam no seu domínio confiável terminam num site
 malicioso — base para phishing convincente.
@@ -188,13 +194,14 @@ destino contra uma allowlist; não redirecione para valores crus do usuário.
 **Onde:** `http://<IP>/seguranca/perfil.php` → "Foto de perfil por URL", ou direto
 em `http://<IP>/seguranca/avatar.php?url=...`.
 
-**Explorar:** o servidor **busca** a URL que você informar. Aponte para um
-recurso que só o servidor alcança:
+**Explorar:** o servidor **busca** a URL que você informar. A própria tela do
+avatar dá a dica (serviços locais em `127.0.0.1`, inclusive `/internal.php`).
+Aponte para um recurso que só o servidor alcança:
 ```
 avatar.php?url=http://127.0.0.1/seguranca/internal.php
 ```
-A página `internal.php` recusa (403) quem a acessa pela rede, mas responde ao
-**próprio servidor** (loopback). Via avatar, o servidor a busca por você e devolve
+A página `internal.php` recusa (403) quem a acessa pela rede — e ainda sugere
+usar o avatar — mas responde ao **próprio servidor** (loopback). Via avatar, o servidor a busca por você e devolve
 o conteúdo — credenciais internas e a flag. (Em nuvem, o alvo clássico seria o
 endpoint de metadados `169.254.169.254`.)
 

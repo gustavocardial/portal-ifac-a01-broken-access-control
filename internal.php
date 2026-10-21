@@ -18,8 +18,10 @@ header('Content-Type: text/plain; charset=utf-8');
 if (SECURE || !$loopback) {
     // Em modo seguro OU se a requisição não vier do próprio servidor: negado.
     http_response_code(403);
-    echo "403 - Serviço interno. Acesso permitido apenas a partir do servidor (loopback).\n";
+    echo "403 - Servico interno. Acesso permitido apenas a partir do servidor (loopback).\n";
     echo "Seu IP: $remoto\n";
+    echo "\nVoce descobriu o endpoint, mas esta chegando pela rede. Em vez de\n";
+    echo "acessa-lo direto, faca o SERVIDOR busca-lo por voce (dica: avatar.php).\n";
     exit;
 }
 

@@ -57,7 +57,7 @@ Troque <code>&lt;IP&gt;</code> pelo IP da máquina do professor.</div>
 
   <tr><td class="num">4</td>
     <td><strong>CSRF troca de e-mail</strong><br><code>csrf_poc.html</code> (abrir do disco)</td>
-    <td>Logado no portal, abrir a isca <code>csrf_poc.html</code> via <code>file://</code> e clicar: POST forjado troca o e-mail para <code>csrf@evil.com</code>.</td>
+    <td>Logado no portal, abrir a isca <code>csrf_poc.html</code> via <code>file://</code> e clicar: POST forjado (cross-site) troca o e-mail. Qualquer e-mail serve.</td>
     <td><span class="flag">FLAG{csrf_trocou_meu_email}</span></td>
     <td class="pts">120</td><td class="cwe">352, 1275</td></tr>
 
@@ -69,7 +69,7 @@ Troque <code>&lt;IP&gt;</code> pelo IP da máquina do professor.</div>
 
   <tr><td class="num">6</td>
     <td><strong>Open redirect</strong><br><code>login.php?next=...</code></td>
-    <td><code>?next=http://&lt;IP&gt;/seguranca/externo.php</code>: após o login, redireciona para o "site do atacante".</td>
+    <td><code>?next=</code> com qualquer URL externa (<code>http://...</code>): após o login, redireciona para fora e cai na página do "atacante" (<code>externo.php</code>).</td>
     <td><span class="flag">FLAG{open_redirect_phishing}</span></td>
     <td class="pts">80</td><td class="cwe">601</td></tr>
 

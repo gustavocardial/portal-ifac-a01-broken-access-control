@@ -33,12 +33,27 @@ page_header('Início');
       'CSRF'        => 'perfil.php',
       'TRAVERSAL'   => 'download.php?file=declaracao_aluno1.txt',
       'REDIRECT'    => 'login.php?next=/dashboard.php',
-      'SSRF'        => 'perfil.php (importar avatar por URL)',
+      'SSRF'        => 'avatar.php',
       'APIEXPOSE'   => 'api/alunos.php',
       'DIRLIST'     => 'uploads/',
       'BACKUP'      => '(fuce a raiz do site)',
       'PHPINFO'     => '(procure uma página de diagnóstico)',
       'FRONTSECRET' => '(veja o código-fonte do front)',
+    ];
+    // Dicas curtas para as missões que, sozinhas, não se explicam.
+    $dicas = [
+      'IDOR'        => 'troque o número do id na URL.',
+      'ADMIN'       => 'existe esse caminho mesmo sem link no menu?',
+      'PRIVESC'     => 'o formulário deixa você escolher o seu papel…',
+      'CSRF'        => 'dispare a troca de e-mail a partir de OUTRA origem; há um exemplo pronto em csrf_poc.html.',
+      'TRAVERSAL'   => 'e se o file apontar para fora da pasta? (../)',
+      'REDIRECT'    => 'troque o next por uma URL externa (http://…).',
+      'SSRF'        => 'faça o servidor buscar um serviço interno (127.0.0.1 / internal.php).',
+      'APIEXPOSE'   => 'que campos a API devolve?',
+      'DIRLIST'     => 'o diretório lista os arquivos?',
+      'BACKUP'      => 'nomes clássicos de arquivos esquecidos.',
+      'PHPINFO'     => 'nome clássico de página de diagnóstico.',
+      'FRONTSECRET' => 'leia os comentários e o localStorage.',
     ];
     $i = 1;
     foreach (flags_catalogo() as $cod => $info):
@@ -53,6 +68,9 @@ page_header('Início');
           <a href="<?= e($b . '/' . explode(' ', $pista)[0]) ?>"><?= e($pista) ?></a>
         <?php else: ?>
           <?= e($pista) ?>
+        <?php endif; ?>
+        <?php if (!empty($dicas[$cod])): ?>
+          <div class="muted" style="font-size:12px;margin-top:3px">💡 <?= e($dicas[$cod]) ?></div>
         <?php endif; ?>
       </td>
       <td><?= (int) $info['pontos'] ?></td>

@@ -85,7 +85,20 @@ function redirect_next(string $next, string $fallback): void {
         exit;
     }
     // Vulnerável: redireciona para onde mandarem.
-    header('Location: ' . ($next !== '' ? $next : $fallback));
+    // Se o destino for externo/absoluto (tem esquema, ou começa com "//"),
+    // passamos pela página externo.php — que faz o papel do "site do atacante"
+    // e revela a flag. Assim QUALQUER destino externo prova o open redirect,
+    // sem o aluno precisar adivinhar o nome de nenhum arquivo.
+    $alvo = $next !== '' ? $next : $fallback;
+    $externo = $next !== '' && (
+        preg_match('#^[a-z][a-z0-9+.-]*:#i', $next)   // http:, https:, javascript:...
+        || str_starts_with($next, '//')               // //host (protocol-relative)
+    );
+    if ($externo) {
+        header('Location: ' . base_url() . '/externo.php?dest=' . urlencode($next));
+        exit;
+    }
+    header('Location: ' . $alvo);
     exit;
 }
 
@@ -101,6 +114,24 @@ function csrf_token(): string {
 /** Campo <input> pronto para colar nos formulários (só faz efeito em modo seguro). */
 function csrf_field(): string {
     return '<input type="hidden" name="csrf" value="' . csrf_token() . '">';
+}
+
+/**
+ * Heurística: a requisição POST atual veio de OUTRO site (cross-site)?
+ * Usada só para didática — revelar a flag de CSRF quando a ação é disparada
+ * por uma página de terceiros. Compara o host de Origin/Referer com o host do
+ * portal. Sem Origin nem Referer, tratamos como cross-site (forjada).
+ */
+function requisicao_cross_site(): bool {
+    // Hostname do portal, sem a porta (HTTP_HOST pode trazer ":8099").
+    $hostPortal = parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST);
+    foreach (['HTTP_ORIGIN', 'HTTP_REFERER'] as $h) {
+        if (!empty($_SERVER[$h])) {
+            $oh = parse_url($_SERVER[$h], PHP_URL_HOST);
+            return $oh !== $hostPortal;   // host diferente do portal => cross-site
+        }
+    }
+    return true; // nenhum cabeçalho de origem => provavelmente forjada
 }
 
 /**

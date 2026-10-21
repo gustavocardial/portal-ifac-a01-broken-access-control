@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $emailAntigo = $eu['email'];
     $novoEmail = trim($_POST['email'] ?? $eu['email']);
 
     /*
@@ -34,8 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $eu['email'] = $novoEmail;
     $eu['role']  = $novoRole;
 
-    // Flag CSRF: e-mail trocado por um POST forjado de outro site (PoC usa @evil.com).
-    if (!SECURE && str_ends_with(strtolower($novoEmail), '@evil.com')) {
+    // Flag CSRF: e-mail trocado por uma requisição forjada de OUTRO site.
+    // Dispara em qualquer troca de e-mail vinda cross-site (ou com o e-mail da
+    // isca @evil.com), não só num valor específico — assim um PoC próprio do
+    // aluno também é premiado.
+    $trocouEmail = strtolower($novoEmail) !== strtolower((string) $emailAntigo);
+    if (!SECURE && $trocouEmail
+        && (requisicao_cross_site() || str_ends_with(strtolower($novoEmail), '@evil.com'))) {
         $msgs[] = ['ok', '🚩 Seu e-mail foi trocado por uma requisição forjada de outro site (CSRF). '
             . 'Flag: <span class="flag">' . e(flags_catalogo()['CSRF']['flag']) . '</span>'];
     }
