@@ -27,6 +27,9 @@ Passo a passo completo (firewall, IP, limpeza): **[LEIA-ME.md](LEIA-ME.md)**.
   como explorar, impacto, CWEs, flag e correção). **Contém o gabarito.**
 - **[GABARITO-impressao.html](GABARITO-impressao.html)** — tabela das 12 flags
   para imprimir (abra no navegador → Imprimir / salvar PDF). **Material do professor.**
+- **[FOLHA-ALUNOS.html](FOLHA-ALUNOS.html)** — folha de missões para distribuir aos
+  alunos (título, onde começar, dica e pontos, **sem as flags**; com espaço para
+  anotar). Imprima pelo navegador.
 
 ## Contas de demonstração
 

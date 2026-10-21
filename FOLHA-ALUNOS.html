@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Folha de Missões — A01 Broken Access Control (IFAC)</title>
+<style>
+  @page { margin: 14mm; }
+  body { font: 12px/1.45 "Segoe UI", system-ui, Arial, sans-serif; color:#111; max-width:900px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 2px; }
+  h2 { font-size:13px; margin:0 0 10px; color:#555; font-weight:normal; }
+  .como { border:1px solid #bcd; background:#f2f7ff; padding:8px 12px; border-radius:6px; font-size:11px; margin:8px 0 14px; }
+  .como b { color:#14498a; }
+  table { width:100%; border-collapse:collapse; margin:6px 0 14px; }
+  th, td { border:1px solid #ccc; padding:5px 7px; text-align:left; vertical-align:top; }
+  th { background:#f0f3f8; }
+  code { font-family:Consolas,"Courier New",monospace; font-size:11px; }
+  .num { text-align:center; width:22px; font-weight:bold; }
+  .pts { text-align:center; width:34px; }
+  .cwe { font-size:10px; color:#666; }
+  .dica { color:#555; font-size:11px; }
+  .achei { width:150px; } /* espaço para o aluno anotar */
+  .muted { color:#666; font-size:11px; }
+  footer { margin-top:10px; font-size:10px; color:#888; border-top:1px solid #ddd; padding-top:6px; }
+  @media print { .noprint { display:none; } body{max-width:none;} }
+</style>
+</head>
+<body>
+<button class="noprint" onclick="window.print()" style="float:right;padding:6px 12px;cursor:pointer">🖨️ Imprimir</button>
+<h1>Folha de Missões — OWASP A01:2025 Broken Access Control</h1>
+<h2>Portal Acadêmico IFAC · encontre, explore e pontue · 12 missões · 1360 pontos</h2>
+
+<div class="como">
+  <b>Como jogar:</b>
+  1) Acesse o portal em <code>http://__________________/</code> (o professor informa o endereço).
+  2) Entre com uma conta de aluno ou cadastre a sua em <code>register.php</code>.
+  3) Em cada missão, explore a página indicada até fazer a falha acontecer — ela revela uma
+     <b>flag</b> no formato <code>FLAG{...}</code>.
+  4) Envie cada flag em <code>placar.php</code> com o nome da sua equipe para pontuar.
+  &nbsp;·&nbsp; <b>Dica geral:</b> use o navegador, o <b>DevTools</b> (F12) e "ver código-fonte" (Ctrl+U).
+</div>
+
+<table>
+  <tr>
+    <th class="num">#</th><th>Missão</th><th>Onde começar</th><th>Dica</th>
+    <th class="pts">Pts</th><th>CWE</th><th class="achei">Flag que encontrei</th>
+  </tr>
+
+  <tr><td class="num">1</td><td><b>IDOR no boletim</b></td>
+    <td><code>boletim.php?id=1</code></td>
+    <td class="dica">troque o número do id na URL.</td>
+    <td class="pts">100</td><td class="cwe">639, 566, 284</td><td></td></tr>
+
+  <tr><td class="num">2</td><td><b>Painel administrativo</b></td>
+    <td><code>admin/</code></td>
+    <td class="dica">esse caminho funciona mesmo sem link no menu?</td>
+    <td class="pts">150</td><td class="cwe">425, 862, 863, 285, 424, 749</td><td></td></tr>
+
+  <tr><td class="num">3</td><td><b>Escalada de privilégio</b></td>
+    <td><code>perfil.php</code></td>
+    <td class="dica">o formulário deixa você escolher o seu papel…</td>
+    <td class="pts">150</td><td class="cwe">285, 639</td><td></td></tr>
+
+  <tr><td class="num">4</td><td><b>CSRF na troca de e-mail</b></td>
+    <td><code>perfil.php</code></td>
+    <td class="dica">dispare a troca de e-mail a partir de OUTRA origem; há um exemplo pronto em <code>csrf_poc.html</code>.</td>
+    <td class="pts">120</td><td class="cwe">352, 1275</td><td></td></tr>
+
+  <tr><td class="num">5</td><td><b>Path traversal no download</b></td>
+    <td><code>download.php?file=declaracao_aluno1.txt</code></td>
+    <td class="dica">e se o <code>file</code> apontar para fora da pasta? (<code>../</code>)</td>
+    <td class="pts">150</td><td class="cwe">22, 23, 36</td><td></td></tr>
+
+  <tr><td class="num">6</td><td><b>Open redirect</b></td>
+    <td><code>login.php?next=/dashboard.php</code></td>
+    <td class="dica">troque o <code>next</code> por uma URL externa (<code>http://…</code>).</td>
+    <td class="pts">80</td><td class="cwe">601</td><td></td></tr>
+
+  <tr><td class="num">7</td><td><b>SSRF no importador de avatar</b></td>
+    <td><code>avatar.php</code></td>
+    <td class="dica">faça o servidor buscar um serviço interno (<code>127.0.0.1 / internal.php</code>).</td>
+    <td class="pts">150</td><td class="cwe">918, 441</td><td></td></tr>
+
+  <tr><td class="num">8</td><td><b>API expõe dados demais</b></td>
+    <td><code>api/alunos.php</code></td>
+    <td class="dica">que campos a API devolve?</td>
+    <td class="pts">120</td><td class="cwe">200, 201, 359</td><td></td></tr>
+
+  <tr><td class="num">9</td><td><b>Listagem de diretório</b></td>
+    <td><code>uploads/</code></td>
+    <td class="dica">o diretório lista os arquivos?</td>
+    <td class="pts">80</td><td class="cwe">548, 552</td><td></td></tr>
+
+  <tr><td class="num">10</td><td><b>Arquivos esquecidos</b></td>
+    <td class="dica">fuce a raiz do site</td>
+    <td class="dica">nomes clássicos de backup e configuração esquecidos.</td>
+    <td class="pts">120</td><td class="cwe">219, 538, 552, 540</td><td></td></tr>
+
+  <tr><td class="num">11</td><td><b>Diagnóstico exposto</b></td>
+    <td class="dica">procure uma página de diagnóstico</td>
+    <td class="dica">nome clássico de página de diagnóstico do PHP.</td>
+    <td class="pts">60</td><td class="cwe">497, 200</td><td></td></tr>
+
+  <tr><td class="num">12</td><td><b>Segredo no front-end</b></td>
+    <td class="dica">veja o código-fonte do front</td>
+    <td class="dica">leia os comentários do JavaScript e o <code>localStorage</code>.</td>
+    <td class="pts">80</td><td class="cwe">540, 615, 922</td><td></td></tr>
+</table>
+
+<p class="muted">Equipe/nome: _______________________________  ·  Total de pontos: _________  ·  Flags: _____ / 12</p>
+
+<footer>
+IFAC · Segurança da Informação · OWASP Top 10 2025 — A01 Broken Access Control.
+Aplicação de laboratório; uso restrito à aula.
+</footer>
+</body>
+</html>
