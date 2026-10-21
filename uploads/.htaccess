@@ -1,0 +1,7 @@
+# CWE-548 — Listagem de diretório habilitada de propósito.
+# Com isto o Apache mostra o índice de arquivos de /uploads/ para qualquer um,
+# expondo comprovantes e anotações internas.
+#
+# CORREÇÃO (discutir na aula): troque por  Options -Indexes  para desligar a
+# listagem, e sirva uploads por um script que valida autorização.
+Options +Indexes

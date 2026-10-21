@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<title>Gabarito — A01 Broken Access Control (IFAC)</title>
+<style>
+  @page { margin: 14mm; }
+  body { font: 12px/1.45 "Segoe UI", system-ui, Arial, sans-serif; color:#111; max-width:900px; margin:0 auto; }
+  h1 { font-size:20px; margin:0 0 2px; }
+  h2 { font-size:13px; margin:0 0 10px; color:#555; font-weight:normal; }
+  .aviso { border:1px solid #c00; background:#fff3f3; color:#900; padding:6px 10px; border-radius:6px; font-size:11px; margin:8px 0 14px; }
+  table { width:100%; border-collapse:collapse; margin:6px 0 16px; }
+  th, td { border:1px solid #ccc; padding:5px 7px; text-align:left; vertical-align:top; }
+  th { background:#f0f3f8; }
+  code { font-family:Consolas,"Courier New",monospace; font-size:11px; }
+  .flag { font-family:Consolas,monospace; font-size:11px; background:#eef9f0; border:1px dashed #2a8; padding:1px 4px; border-radius:4px; white-space:nowrap; }
+  .num { text-align:center; width:22px; font-weight:bold; }
+  .pts { text-align:center; width:34px; }
+  .cwe { font-size:10px; color:#666; }
+  .muted { color:#666; font-size:11px; }
+  footer { margin-top:10px; font-size:10px; color:#888; border-top:1px solid #ddd; padding-top:6px; }
+  @media print { .noprint { display:none; } body{max-width:none;} }
+</style>
+</head>
+<body>
+<button class="noprint" onclick="window.print()" style="float:right;padding:6px 12px;cursor:pointer">🖨️ Imprimir</button>
+<h1>Gabarito — OWASP A01:2025 Broken Access Control</h1>
+<h2>Portal Acadêmico IFAC · laboratório prático · 12 flags · 1360 pontos no total</h2>
+
+<div class="aviso"><strong>Material do professor — contém o gabarito.</strong>
+Não distribua aos alunos. App vulnerável de propósito: use só em rede de laboratório.
+Troque <code>&lt;IP&gt;</code> pelo IP da máquina do professor.</div>
+
+<table>
+  <tr>
+    <th class="num">#</th><th>Missão / onde começar</th><th>Como explorar (resumo)</th>
+    <th>Flag</th><th class="pts">Pts</th><th>CWE</th>
+  </tr>
+
+  <tr><td class="num">1</td>
+    <td><strong>IDOR no boletim</strong><br><code>boletim.php?id=1</code></td>
+    <td>Trocar o <code>id</code> na URL (<code>?id=2</code>, <code>?id=3</code>) lê o boletim de outros alunos.</td>
+    <td><span class="flag">FLAG{idor_boletim_de_outro_aluno}</span></td>
+    <td class="pts">100</td><td class="cwe">639, 566, 284</td></tr>
+
+  <tr><td class="num">2</td>
+    <td><strong>Forced browsing admin</strong><br><code>admin/</code></td>
+    <td>Como aluno comum, digitar a URL do painel (sem link no menu) abre a área admin.</td>
+    <td><span class="flag">FLAG{forced_browsing_painel_admin}</span></td>
+    <td class="pts">150</td><td class="cwe">425, 862, 863, 285, 424, 749</td></tr>
+
+  <tr><td class="num">3</td>
+    <td><strong>Escalada de privilégio</strong><br><code>perfil.php</code></td>
+    <td>No formulário de perfil, escolher <code>role=admin</code> e salvar promove o próprio usuário.</td>
+    <td><span class="flag">FLAG{virei_admin_sozinho}</span></td>
+    <td class="pts">150</td><td class="cwe">285, 639</td></tr>
+
+  <tr><td class="num">4</td>
+    <td><strong>CSRF troca de e-mail</strong><br><code>csrf_poc.html</code> (abrir do disco)</td>
+    <td>Logado no portal, abrir a isca <code>csrf_poc.html</code> via <code>file://</code> e clicar: POST forjado troca o e-mail para <code>csrf@evil.com</code>.</td>
+    <td><span class="flag">FLAG{csrf_trocou_meu_email}</span></td>
+    <td class="pts">120</td><td class="cwe">352, 1275</td></tr>
+
+  <tr><td class="num">5</td>
+    <td><strong>Path traversal</strong><br><code>download.php?file=...</code></td>
+    <td><code>?file=../.env</code> ou <code>?file=../backup.sql</code> escapam da pasta e leem arquivos arbitrários.</td>
+    <td><span class="flag">FLAG{path_traversal_leu_o_env}</span></td>
+    <td class="pts">150</td><td class="cwe">22, 23, 36</td></tr>
+
+  <tr><td class="num">6</td>
+    <td><strong>Open redirect</strong><br><code>login.php?next=...</code></td>
+    <td><code>?next=http://&lt;IP&gt;/seguranca/externo.php</code>: após o login, redireciona para o "site do atacante".</td>
+    <td><span class="flag">FLAG{open_redirect_phishing}</span></td>
+    <td class="pts">80</td><td class="cwe">601</td></tr>
+
+  <tr><td class="num">7</td>
+    <td><strong>SSRF no avatar</strong><br><code>avatar.php?url=...</code></td>
+    <td><code>?url=http://127.0.0.1/seguranca/internal.php</code>: o servidor busca o recurso interno (403 para o aluno) e devolve o segredo.</td>
+    <td><span class="flag">FLAG{ssrf_bateu_no_localhost}</span></td>
+    <td class="pts">150</td><td class="cwe">918, 441</td></tr>
+
+  <tr><td class="num">8</td>
+    <td><strong>API expõe demais</strong><br><code>api/alunos.php</code></td>
+    <td>JSON sem auth devolve todos os usuários com senha, hash e CPF. Flag no campo <code>_flag</code>.</td>
+    <td><span class="flag">FLAG{api_vazou_cpf_e_hash}</span></td>
+    <td class="pts">120</td><td class="cwe">200, 201, 359</td></tr>
+
+  <tr><td class="num">9</td>
+    <td><strong>Listagem de diretório</strong><br><code>uploads/</code></td>
+    <td>Índice do Apache lista arquivos; abrir <code>uploads/notas_internas.txt</code>.</td>
+    <td><span class="flag">FLAG{listagem_de_diretorio_aberta}</span></td>
+    <td class="pts">80</td><td class="cwe">548, 552</td></tr>
+
+  <tr><td class="num">10</td>
+    <td><strong>Backup/.env no web root</strong><br><code>backup.sql</code>, <code>.env</code></td>
+    <td>Acessar direto <code>/seguranca/backup.sql</code> e <code>/seguranca/.env</code> na raiz do app.</td>
+    <td><span class="flag">FLAG{backup_sql_sob_o_webroot}</span></td>
+    <td class="pts">120</td><td class="cwe">219, 538, 552, 540</td></tr>
+
+  <tr><td class="num">11</td>
+    <td><strong>phpinfo exposto</strong><br><code>phpinfo.php</code></td>
+    <td>Página de diagnóstico revela ambiente do servidor; flag no topo.</td>
+    <td><span class="flag">FLAG{phpinfo_exposto}</span></td>
+    <td class="pts">60</td><td class="cwe">497, 200</td></tr>
+
+  <tr><td class="num">12</td>
+    <td><strong>Segredo no front</strong><br><code>assets/js/app.js</code></td>
+    <td>Ver código-fonte (Ctrl+U) → comentário "TODO" com API_KEY e flag; token em <code>localStorage</code>.</td>
+    <td><span class="flag">FLAG{segredo_no_javascript}</span></td>
+    <td class="pts">80</td><td class="cwe">540, 615, 922</td></tr>
+</table>
+
+<p class="muted"><strong>Contas:</strong>
+<code>aluno1/123</code>, <code>aluno2/bruno</code>, <code>aluno3/senha</code>,
+<code>prof1/123</code>, <code>admin/admin</code>.
+&nbsp;·&nbsp; <strong>Modo seguro:</strong> botão no topo do site alterna
+vulnerável ⇄ corrigido (bloqueia todos os ataques acima).</p>
+
+<footer>
+IFAC · Segurança da Informação · OWASP Top 10 2025 — A01. Detalhes de impacto e
+correção de cada item em <code>ROTEIRO-PROFESSOR.md</code>.
+</footer>
+</body>
+</html>

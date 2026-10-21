@@ -1,0 +1,2 @@
+Rascunho interno da coordenação — não deveria estar público.
+FLAG{listagem_de_diretorio_aberta}
